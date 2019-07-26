@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>CS-498 D3 Transitions Example</title>
+
+        <meta charset="utf-8" />
+        <meta name="author" content="Adam Reid" />
+        <meta name="description" content="CS-498 D3 Week 7-3-3 Assignment" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <style> .chart rect { fill: steelblue } </style>
+    </head>
+
+    <body>
+        <header class="container">
+            <h1 class="col-md-8"> <i>CS-498 Data Visualization - Narrative Visualization</i></h1>
+        </header>
+
+        <main role="main" class="container">
+            <section class="col-md-8">
+                <p>Here are the magic numbers from Lost: <span id="data"></span></p>
+                <svg class="chart" width="120" height="500"></svg>
+            </section>
+        </main>
+
+        <script>
+            var data = [4, 8, 15, 16, 23, 42];
+            document.getElementById("data").innerHTML = data;
+
+            d3.select(".chart")
+                .selectAll("rect")
+                .data(data)
+                .enter().append("rect")
+                .attr("width", 19)
+                .attr("x", function(d, i) { return 20*i; })
+                .attr("y", 400)
+                .transition().duration(3000).delay(1000)
+                .attr("height", function(d) {return 10 * d; })
+                .attr("y", function(d) { return 420 - 10 * d; });
+        </script>
+    </body>
+</html>
