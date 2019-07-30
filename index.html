@@ -15,7 +15,7 @@
         <style> .chart rect { fill: steelblue } </style>
     </head>
 
-    <body>
+    <body  onload='init()'>
         <header class="container">
             <h1 class="col-md-10"> <em>CS-498 Data Visualization - Narrative Visualization</em></h1>
             <h2 class="col-md-10">Distribution of Transportation Fatalities by Mode</h2>
@@ -54,22 +54,30 @@
         </footer>
 
         <script>
-            //async function init() { // Allow for loading
+            async function init() { // Allow for loading
 
-            var data = [4, 8, 15, 16, 23, 42];
-            document.getElementById("data").innerHTML = data;
-
-            d3.select(".chart")
-                .selectAll("rect")
-                .data(data)
-                .enter().append("rect")
-                .attr("width", 19)
-                .attr("x", function(d, i) { return 20*i; })
-                .attr("y", 400)
-                .transition().duration(3000).delay(1000)
-                .attr("height", function(d) {return 10 * d; })
-                .attr("y", function(d) { return 420 - 10 * d; });
-            //}
+                var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
+                    return {
+                         "x": +d.x,
+                         "y": +d.y
+                     }
+                }).then(function(data) {
+                    d3.select(".chart")
+                        .selectAll("rect")
+                        .data(data)
+                        .enter().append("rect")
+                        .attr("width", 19)
+                        .attr("x", function(d, i) { return 20*i; })
+                        .attr("y", 400)
+                        .transition().duration(3000).delay(1000)
+                        .attr("height", function(d) {return 10 * d.y; })
+                        .attr("y", function(d) { return 420 - 10 * d.y; });
+                }).catch(function(error, rows) {
+                    console.log("An error occurred.");
+                    console.log(error);
+                    console.log(rows);
+                });            
+            }
         </script>
     </body>
 </html>
