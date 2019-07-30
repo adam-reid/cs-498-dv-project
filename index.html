@@ -17,17 +17,45 @@
 
     <body>
         <header class="container">
-            <h1 class="col-md-8"> <i>CS-498 Data Visualization - Narrative Visualization</i></h1>
+            <h1 class="col-md-10"> <em>CS-498 Data Visualization - Narrative Visualization</em></h1>
+            <h2 class="col-md-10">Distribution of Transportation Fatalities by Mode</h2>
+            <h3 class="col-md-10">By: Adam Reid</h3>
         </header>
+        <hr/>
 
         <main role="main" class="container">
-            <section class="col-md-8">
-                <p>Here are the magic numbers from Lost: <span id="data"></span></p>
-                <svg class="chart" width="120" height="500"></svg>
+            <section class="col-md-10" style="float: left">
+                <p>This is where the text will go. 
+                This is where the text will go. 
+                This is where the text will go. 
+                This is where the text will go. 
+                This is where the text will go. 
+                This is where the text will go. 
+                This is where the text will go. 
+                <span id="data"></span></p>
+                <p>
+                <nav align="center">
+                  <a href="/html/">Previous</a> |
+                  <a href="/css/">Home</a> |
+                  <a href="/js/">Next</a>                  
+                </nav>
+                </p>                
             </section>
+
+            <section class="col-md-10" style="float: right">
+            <p>section 2</p>
+            <svg class="chart" width="120" height="500"></svg>
+            </section>
+
         </main>
 
+        <footer class="col-md-8">
+        footer
+        </footer>
+
         <script>
+            //async function init() { // Allow for loading
+
             var data = [4, 8, 15, 16, 23, 42];
             document.getElementById("data").innerHTML = data;
 
@@ -41,6 +69,7 @@
                 .transition().duration(3000).delay(1000)
                 .attr("height", function(d) {return 10 * d; })
                 .attr("y", function(d) { return 420 - 10 * d; });
+            //}
         </script>
     </body>
 </html>
