@@ -44,9 +44,8 @@
 
             <section class="col-md-10" style="float: right">
             <p>section 2</p>
-            <svg class="chart" width="120" height="500"></svg>
+            <svg class="chart" width=500 height=500></svg>
             </section>
-
         </main>
 
         <footer class="col-md-8">
@@ -54,28 +53,54 @@
         </footer>
 
         <script>
-            async function init() { // Allow for loading
+            var height = 400;
+            var width = 400;
+            var margin = 50;
 
+            var svg = d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + margin + ")");
+            var tick_format = d3.format("~s");
+
+            async function init() { // Allow for loading
                 var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
                     return {
                          "x": +d.x,
                          "y": +d.y
                      }
                 }).then(function(data) {
+                    var xdomain = [0, 1, 2, 3, 4, 5]
+                    var ydomain = [0, d3.max([1,2,42])]
+
+                    var xrange = [0, width];
+                    var yrange = [height, 0];
+
+                    console.log("Keys: " + Object.keys(data));
+                    console.log("Values: " + Object.values(data));
+
+                    var xscale = d3.scaleBand().domain(xdomain).range(xrange);
+                    var yscale = d3.scaleLinear().domain(ydomain).range(yrange);
+
+                    d3.select("svg")
+                        .append("g")
+                        .attr("transform", "translate("+margin+","+margin+")")
+                        .call(d3.axisLeft(yscale).tickFormat(tick_format));
+
+                    d3.select("svg")
+                        .append("g")
+                        .attr("transform", "translate("+margin+","+(height+margin)+")")
+                        .call(d3.axisBottom(xscale).tickFormat(tick_format));
+
                     d3.select(".chart")
                         .selectAll("rect")
                         .data(data)
                         .enter().append("rect")
-                        .attr("width", 19)
-                        .attr("x", function(d, i) { return 20*i; })
-                        .attr("y", 400)
+                        .attr("width", xscale.bandwidth)
+                        .attr("x", function(d, i) { return margin + xscale(i); })
+                        .attr("y", height + margin)
                         .transition().duration(3000).delay(1000)
-                        .attr("height", function(d) {return 10 * d.y; })
-                        .attr("y", function(d) { return 420 - 10 * d.y; });
+                        .attr("height", function(d, i) {return height - yscale(d.y); })
+                        .attr("y", function(d) { return margin + yscale(d.y); });
                 }).catch(function(error, rows) {
                     console.log("An error occurred.");
-                    console.log(error);
-                    console.log(rows);
                 });            
             }
         </script>
