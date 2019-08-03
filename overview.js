@@ -63,6 +63,28 @@ async function init() { // Allow for loading
 
         var stack = d3.stack().keys(keys)(data);
 
+        // Set up legends
+        var legend = d3.select("svg").append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("text-anchor", "end")
+        .selectAll("g")
+        .data(keys.slice().reverse())
+        .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+        legend.append("rect")
+            .attr("x", width + 250 - 19)
+            .attr("width", 19)
+            .attr("height", 19)
+            .style("fill", function(d, i) { return cscale[i%cscale.length]; })
+
+        legend.append("text")
+            .attr("x", width + 250 - 50)
+            .attr("y", 9.5)
+            .attr("dy", "0.32em")
+            .text(function(d) { return d; });
+
         // Set up the chart.
         var chart = d3.select("svg")
             .attr("transform", "translate(" + margin + "," + margin + ")")
@@ -79,16 +101,6 @@ async function init() { // Allow for loading
             //.style("fill", function(d, i) { return colors[i%10]; })//return colors(i%10);})//(d.key); })
             .attr("y", height + margin);
 
-            /*.on("mouseover", function() { tooltip.style("display", null); })
-            .on("mouseout", function() { tooltip.style("display", "none"); })
-            .on("mousemove", function(d) {
-              console.log(d);
-              var xPosition = d3.mouse(this)[0] - 5;
-              var yPosition = d3.mouse(this)[1] - 5;
-              tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-              tooltip.select("text").text(d[1]-d[0]);
-            });*/
-
         // Set up initial transition
         chart.transition()
             .duration(1000)
@@ -100,10 +112,10 @@ async function init() { // Allow for loading
         // Set up Mouse events
         var inspect = 0;
 
-        chart.on("mouseover", function(d) {
+        chart.on("mouseover", function(d, i) {
                 tooltip.transition().duration(250).style('opacity', .9);
 
-                tooltip.html(d.data["TOTAL fatalities"])
+                tooltip.html(d[1] - d[0])
                     .style('left', (d3.event.pageX - 35 + 'px'))
                     .style('top', (d3.event.pageY - 30 + 'px'));
                 d3.select(this).style("opacity", .5);
@@ -112,7 +124,7 @@ async function init() { // Allow for loading
                 tooltip.transition().duration(250).style('opacity', 0);
                 d3.select(this).style("opacity", 1);
             })
-            .on('click', function(d, i, c) {
+            .on('click', function(d, i) {
                 inspect = (inspect + 1) % 2;
 
                 var j = 0;
@@ -134,36 +146,66 @@ async function init() { // Allow for loading
                     .attr("y", function(nd, ni) {
                         if (inspect == 0)
                             return margin + yscale(nd[1]);
-                        else if (stack[j][ni] == nd) {
+                        else if (stack[j][ni] == nd)
                             return margin + yscale(nd[1] - nd[0]);
-                        }
                         else
                             return height + margin;
                     });
+
+                legend
+                    .attr("font-weight", function(d, i) { return (i == j && inspect == 1) ? "bold" : "normal";})
+                    .style("fill", function(d, i) { return (i == j && inspect == 1) ? "red" : "black";})
+                    .attr("font-size", function(d, i) { return (i == j && inspect == 1) ? "14" : "10";});
             });
 
-            // Legends!
-            var legend = d3.select("svg").append("g")
-                .attr("font-family", "sans-serif")
-                .attr("font-size", 10)
-                .attr("text-anchor", "end")
-                .selectAll("g")
-                .data(keys.slice().reverse())
-                .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        legend
+            .on("mouseover", function(d, i) {
+                if (inspect == 1)
+                    return; // do nothing.
 
-            legend.append("rect")
-                .attr("x", width + 250 - 19)
-                .attr("width", 19)
-                .attr("height", 19)
-                .style("fill", function(d, i) { return cscale[i%cscale.length]; })
+                d3.select(this)
+                    .attr("font-weight", "bold")
+                    .style("fill", "red")
+                    .attr("font-size", "14");
 
-            legend.append("text")
-                .attr("x", width + 250 - 24)
-                .attr("y", 9.5)
-                .attr("dy", "0.32em")
-                .text(function(d) { return d; });
+                chart.style("opacity", function(c, ci) { return stack[i][ci] == c ? 0.5 : 1; });
+            })
+            .on('mouseout', function(d) {
+                if (inspect == 1)
+                    return; // do nothing.
 
+                d3.select(this)
+                        .attr("font-weight", "normal")
+                        .style("fill", "black")
+                        .attr("font-size", "10");
+
+                chart.style("opacity", "1");
+            })
+            .on('click', function(d, j) {
+                inspect = (inspect + 1) % 2;
+
+                chart.transition()
+                    .duration(1500)
+                    .attr("height", function(nd, ni) {
+                        if (inspect == 0 || stack[j][ni] == nd)
+                            return yscale(nd[0]) - yscale(nd[1]);
+                        else
+                            return 0;
+                    })
+                    .attr("y", function(nd, ni) {
+                        if (inspect == 0)
+                            return margin + yscale(nd[1]);
+                        else if (stack[j][ni] == nd)
+                            return margin + yscale(nd[1] - nd[0]);
+                        else
+                            return height + margin;
+                    });
+
+                legend
+                    .attr("font-weight", function(d, i) { return (i == j && inspect == 1) ? "bold" : "normal";})
+                    .style("fill", function(d, i) { return (i == j && inspect == 1) ? "red" : "black";})
+                    .attr("font-size", function(d, i) { return (i == j && inspect == 1) ? "14" : "10";});
+            });
 
     }).catch(function(error, rows) {
         console.log("An error occurred.");
