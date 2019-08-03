@@ -8,7 +8,7 @@
         <meta name="description" content="CS-498 D3 Week 7-3-3 Assignment" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
         <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -17,40 +17,33 @@
 
     <body  onload='init()'>
         <header class="container">
-            <h1 class="col-md-10"> <em>CS-498 Data Visualization - Narrative Visualization</em></h1>
-            <h2 class="col-md-10">Distribution of Transportation Fatalities by Mode</h2>
-            <h3 class="col-md-10">By: Adam Reid</h3>
+            <h1 class="col"> <em>CS-498 Data Visualization - Narrative Visualization</em></h1>
+            <h2 class="col">Distribution of Transportation Fatalities by Mode</h2>
+            <h3 class="col">By: Adam Reid</h3>
         </header>
         <hr/>
 
-        <main role="main" class="container">
-            <section class="col-md-10" style="float: left">
-                <p>This is where the text will go. 
-                This is where the text will go. 
-                This is where the text will go. 
-                This is where the text will go. 
-                This is where the text will go. 
-                This is where the text will go. 
-                This is where the text will go. 
-                <span id="data"></span></p>
-                <p>
-                <nav align="center">
-                  <a href="/html/">Previous</a> |
-                  <a href="/css/">Home</a> |
-                  <a href="/js/">Next</a>                  
+        <div class="container">
+            <p>
+                <nav align="center" class="navbar navbar-dark bg-dark" style="color: white">
+                    <a href="/html/" style="color: white">Overview</a> |
+                    <a href="/css/" style="color: whitesmoke">Highest</a> |
+                    <a href="/js/" style="color: whitesmoke">Lowest</a>
                 </nav>
-                </p>                
-            </section>
+            </p>
 
-            <section class="col-md-10" style="float: right">
-            <p>section 2</p>
-            <svg class="chart" width=500 height=500></svg>
-            </section>
-        </main>
+            <section class="row">
+                <section class="col">
+                    <p>
+                        <span id="info"></span>
+                    </p>
+                </section>
 
-        <footer class="col-md-8">
-        footer
-        </footer>
+                <section class="col">
+                    <svg class="chart" width=500 height=500></svg>
+                </section>
+            </section>
+        </div>
 
         <script>
             var height = 400;
@@ -101,7 +94,9 @@
                         .attr("y", function(d) { return margin + yscale(d.y); });
                 }).catch(function(error, rows) {
                     console.log("An error occurred.");
-                });            
+                });
+
+                document.getElementById("info").innerHTML = "asdf";
             }
         </script>
     </body>
