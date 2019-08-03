@@ -49,17 +49,18 @@ async function init() { // Allow for loading
 
         // Set up tool tip.
         var tooltip = d3.select('body')
-                .append('div')
-                .style('position', 'absolute')
-                .style('padding', '0 10px')
-                .style('background', 'white')
-                .style('opacity', 0);
+            .append('div')
+            .style('position', 'absolute')
+            .style('padding', '0 10px')
+            .style('background', 'white')
+            .style('opacity', 0);
 
         // Set up the chart.
         var chart = d3.select(".chart")
             .selectAll("rect")
             .data(data)
             .enter().append("rect")
+            .style("fill", function(d, i) { return colors(i); })
             .attr("width", xscale.bandwidth)
             .attr("x", function(d) { return margin + xscale(d.x); })
             .attr("y", height + margin);
@@ -78,7 +79,7 @@ async function init() { // Allow for loading
         chart.on("mouseover", function(d) {
                 tooltip.transition().duration(250).style('opacity', .9);
 
-                tooltip.html(d)
+                tooltip.html(d.x)
                     .style('left', (d3.event.pageX - 35 + 'px'))
                     .style('top', (d3.event.pageY - 30 + 'px'));
                 d3.select(this).style("opacity", .5);
