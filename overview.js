@@ -1,5 +1,5 @@
 var height = 400;
-var width = 500;
+var width = 900;
 var margin = 50;
 
 var svg = d3.select("svg")
@@ -7,11 +7,14 @@ var svg = d3.select("svg")
     .attr("transform", "translate(" + margin + "," + margin + ")");
 
 async function init() { // Allow for loading
-    var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
-        return  {
-            "Year": +d.x,
-            "total": +d.y
-        }
+    var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/table_02_04q418.csv", function(d, i, columns) {
+        for(i = 0; i < columns.length; i++)
+            d[columns[i]] = +d[columns[i]];
+
+        d.total = d["TOTAL fatalities"];
+        delete d["TOTAL fatalities"];
+
+        return d;
     }).then(function(data) {
 
         var keys = data.columns.slice(1);
@@ -20,10 +23,13 @@ async function init() { // Allow for loading
         var xarray = data.map(function(d) {return d.Year; });
         var yarray = data.map(function(d) {return d.total; });
 
+        // Find y limit
+        var ymax = d3.max(yarray)
+        var yupper = Math.ceil(ymax/10000)*10000;
+
         // Create domains
-        //var xdomain = [d3.min(xarray), d3.max(xarray)];
         var xdomain = xarray;
-        var ydomain = [0, d3.max(yarray)];
+        var ydomain = [0, yupper];
 
         // Create ranges
         var xrange = [0, width];
@@ -47,7 +53,7 @@ async function init() { // Allow for loading
         d3.select("svg")
             .append("g")
             .attr("transform", "translate("+margin+","+(height+margin)+")")
-            .call(d3.axisBottom(xscale).tickFormat(tick_format));
+            .call(d3.axisBottom(xscale));//.tickFormat(tick_format));
 
         // Set up tool tip.
         var tooltip = d3.select('body')
