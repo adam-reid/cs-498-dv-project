@@ -1,6 +1,6 @@
-var height = 400;
-var width = 900;
-var margin = 50;
+var height = 450;
+var width = 750;
+var margin = 25;
 
 var svg = d3.select("svg")
     .append("g")
@@ -11,17 +11,13 @@ async function init() { // Allow for loading
         for(i = 0; i < columns.length; i++)
             d[columns[i]] = +d[columns[i]];
 
-        d.total = d["TOTAL fatalities"];
-        delete d["TOTAL fatalities"];
-
         return d;
     }).then(function(data) {
-
-        var keys = data.columns.slice(1);
+        var keys = data.columns.slice(2); // skip year and totals.
 
         // Prep the data
         var xarray = data.map(function(d) {return d.Year; });
-        var yarray = data.map(function(d) {return d.total; });
+        var yarray = data.map(function(d) {return d["TOTAL fatalities"]; });
 
         // Find y limit
         var ymax = d3.max(yarray)
@@ -30,15 +26,17 @@ async function init() { // Allow for loading
         // Create domains
         var xdomain = xarray;
         var ydomain = [0, yupper];
+        var cdomain = keys;
 
         // Create ranges
         var xrange = [0, width];
         var yrange = [height, 0];
+        var crange = ['#26BBD2', '#C61C6F'];
 
         // Create scales
         var xscale = d3.scaleBand().domain(xdomain).paddingInner(0.1).paddingOuter(0.1).range(xrange);
         var yscale = d3.scaleLinear().domain(ydomain).range(yrange);
-        var colors = d3.scaleLinear().domain([0, d3.max(xarray)]).range(['#26BBD2', '#C61C6F']);
+        var cscale = d3.schemePaired;
 
         // X-Tick format
         var tick_format = d3.format("~s");
@@ -63,23 +61,41 @@ async function init() { // Allow for loading
             .style('background', 'white')
             .style('opacity', 0);
 
+        var stack = d3.stack().keys(keys)(data);
+
         // Set up the chart.
-        var chart = d3.select(".chart")
+        var chart = d3.select("svg")
+            .attr("transform", "translate(" + margin + "," + margin + ")")
+            .append("g")
+            .selectAll("g")
+            .data(stack)
+            .enter().append("g")
+            .style("fill", function(d, i) { return cscale[i%cscale.length]; })
             .selectAll("rect")
-            .data(data)
+            .data(function(d) { return d; })
             .enter().append("rect")
-            .style("fill", function(d, i) { return colors(d.Year); })
             .attr("width", xscale.bandwidth)
-            .attr("x", function(d) { return margin + xscale(d.Year); })
+            .attr("x", function(d) { return margin + xscale(d.data.Year); })
+            //.style("fill", function(d, i) { return colors[i%10]; })//return colors(i%10);})//(d.key); })
             .attr("y", height + margin);
+
+            /*.on("mouseover", function() { tooltip.style("display", null); })
+            .on("mouseout", function() { tooltip.style("display", "none"); })
+            .on("mousemove", function(d) {
+              console.log(d);
+              var xPosition = d3.mouse(this)[0] - 5;
+              var yPosition = d3.mouse(this)[1] - 5;
+              tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+              tooltip.select("text").text(d[1]-d[0]);
+            });*/
 
         // Set up initial transition
         chart.transition()
             .duration(1000)
             .delay(250)
             .ease(d3.easeBackOut)
-            .attr("height", function(d) {return height - yscale(d.total); })
-            .attr("y", function(d) { return margin + yscale(d.total); });
+            .attr("height", function(d) { return yscale(d[0]) - yscale(d[1]); })
+            .attr("y", function(d) { return margin + yscale(d[1]); });
 
         // Set up Mouse events
         var inspect = 0;
@@ -87,7 +103,7 @@ async function init() { // Allow for loading
         chart.on("mouseover", function(d) {
                 tooltip.transition().duration(250).style('opacity', .9);
 
-                tooltip.html(d.total)
+                tooltip.html(d.data["TOTAL fatalities"])
                     .style('left', (d3.event.pageX - 35 + 'px'))
                     .style('top', (d3.event.pageY - 30 + 'px'));
                 d3.select(this).style("opacity", .5);
@@ -96,24 +112,57 @@ async function init() { // Allow for loading
                 tooltip.transition().duration(250).style('opacity', 0);
                 d3.select(this).style("opacity", 1);
             })
-            .on('click', function(d, i) {
+            .on('click', function(d, i, c) {
                 inspect = (inspect + 1) % 2;
+
+                var j = 0;
+
+                for (j = 0; j < stack.length; j++) {
+                    if (stack[j][i][0] == d[0] && stack[j][i][1] ==d[1]) {
+                        break;
+                    }
+                }
 
                 chart.transition()
                     .duration(1500)
                     .attr("height", function(nd, ni) {
-                        if (inspect == 0 || i == ni)
-                            return height - yscale(nd.total);
+                        if (inspect == 0 || stack[j][ni] == nd)
+                            return yscale(nd[0]) - yscale(nd[1]);
                         else
                             return 0;
                     })
                     .attr("y", function(nd, ni) {
-                        if (inspect == 0 || i == ni)
-                            return margin + yscale(nd.total);
+                        if (inspect == 0)
+                            return margin + yscale(nd[1]);
+                        else if (stack[j][ni] == nd) {
+                            return margin + yscale(nd[1] - nd[0]);
+                        }
                         else
                             return height + margin;
                     });
             });
+
+            // Legends!
+            var legend = d3.select("svg").append("g")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", 10)
+                .attr("text-anchor", "end")
+                .selectAll("g")
+                .data(keys.slice().reverse())
+                .enter().append("g")
+                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+            legend.append("rect")
+                .attr("x", width + 250 - 19)
+                .attr("width", 19)
+                .attr("height", 19)
+                .style("fill", function(d, i) { return cscale[i%cscale.length]; })
+
+            legend.append("text")
+                .attr("x", width + 250 - 24)
+                .attr("y", 9.5)
+                .attr("dy", "0.32em")
+                .text(function(d) { return d; });
 
 
     }).catch(function(error, rows) {
