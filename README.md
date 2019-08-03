@@ -18,16 +18,16 @@
 
 Transformation steps are as follows:
 1. Clean
-  1. Remove Percentage columns
-  1. Add Year row.
-  1. Leave **N** for filtering in csv step.
-  1. Keep **R** data as value only.
-  1. Keep all **P** data (all 2017).
+    1. Remove Percentage columns
+    1. Add Year row.
+    1. Leave **N** for filtering in csv step.
+    1. Keep **R** data as value only.
+    1. Keep all **P** data (all 2017).
 1. CSV
-  1. Transpose data into records keyed by year.
-  1. Coerce all data to numerical type.
-  1. Replace **N** as `0` in transpose tab.
-  1. Export as CSV
+    1. Transpose data into records keyed by year.
+    1. Coerce all data to numerical type.
+    1. Replace **N** as `0` in transpose tab.
+    1. Export as CSV
 
 
 ## Data source foot notes
