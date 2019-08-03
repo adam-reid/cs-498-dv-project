@@ -52,10 +52,11 @@
             var tick_format = d3.format("~s");
 
             async function init() { // Allow for loading
-                var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
+                //var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
+                var data = await d3.csv("table_02_04q418.csv", function(d) {
+                    console.log(d)
                     return {
-                         "x": +d.x,
-                         "y": +d.y
+                         "x": +d.Year
                      }
                 }).then(function(data) {
                     var xdomain = [0, 1, 2, 3, 4, 5]
