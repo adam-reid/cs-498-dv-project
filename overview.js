@@ -5,21 +5,20 @@ var margin = 50;
 var svg = d3.select("svg")
     .append("g")
     .attr("transform", "translate(" + margin + "," + margin + ")");
-var tick_format = d3.format("~s");
 
 async function init() { // Allow for loading
     var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
-        return {
-                //"x": +d.Year,
-                //"y": +d["TOTAL fatalities"]
-                "x": +d.x,
-                "y": +d.y
-            }
+        return  {
+            "Year": +d.x,
+            "total": +d.y
+        }
     }).then(function(data) {
 
+        var keys = data.columns.slice(1);
+
         // Prep the data
-        var xarray = data.map(function(d) {return d.x; });
-        var yarray = data.map(function(d) {return d.y; });
+        var xarray = data.map(function(d) {return d.Year; });
+        var yarray = data.map(function(d) {return d.total; });
 
         // Create domains
         //var xdomain = [d3.min(xarray), d3.max(xarray)];
@@ -34,6 +33,9 @@ async function init() { // Allow for loading
         var xscale = d3.scaleBand().domain(xdomain).paddingInner(0.1).paddingOuter(0.1).range(xrange);
         var yscale = d3.scaleLinear().domain(ydomain).range(yrange);
         var colors = d3.scaleLinear().domain([0, d3.max(xarray)]).range(['#26BBD2', '#C61C6F']);
+
+        // Tick formats
+        var tick_format = d3.format("~s");
 
         // Set up left axis
         d3.select("svg")
@@ -62,7 +64,7 @@ async function init() { // Allow for loading
             .enter().append("rect")
             .style("fill", function(d, i) { return colors(i); })
             .attr("width", xscale.bandwidth)
-            .attr("x", function(d) { return margin + xscale(d.x); })
+            .attr("x", function(d) { return margin + xscale(d.Year); })
             .attr("y", height + margin);
 
         // Set up initial transition
@@ -70,8 +72,8 @@ async function init() { // Allow for loading
             .duration(1000)
             .delay(250)
             .ease(d3.easeBackOut)
-            .attr("height", function(d) {return height - yscale(d.y); })
-            .attr("y", function(d) { return margin + yscale(d.y); });
+            .attr("height", function(d) {return height - yscale(d.total); })
+            .attr("y", function(d) { return margin + yscale(d.total); });
 
         // Set up Mouse events
         var inspect = 0;
@@ -79,7 +81,7 @@ async function init() { // Allow for loading
         chart.on("mouseover", function(d) {
                 tooltip.transition().duration(250).style('opacity', .9);
 
-                tooltip.html(d.x)
+                tooltip.html(d.total)
                     .style('left', (d3.event.pageX - 35 + 'px'))
                     .style('top', (d3.event.pageY - 30 + 'px'));
                 d3.select(this).style("opacity", .5);
@@ -95,13 +97,13 @@ async function init() { // Allow for loading
                     .duration(1500)
                     .attr("height", function(nd, ni) {
                         if (inspect == 0 || i == ni)
-                            return height - yscale(nd.y);
+                            return height - yscale(nd.total);
                         else
                             return 0;
                     })
                     .attr("y", function(nd, ni) {
                         if (inspect == 0 || i == ni)
-                            return margin + yscale(nd.y);
+                            return margin + yscale(nd.total);
                         else
                             return height + margin;
                     });
