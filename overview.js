@@ -40,7 +40,7 @@ async function init() { // Allow for loading
         var yscale = d3.scaleLinear().domain(ydomain).range(yrange);
         var colors = d3.scaleLinear().domain([0, d3.max(xarray)]).range(['#26BBD2', '#C61C6F']);
 
-        // Tick formats
+        // X-Tick format
         var tick_format = d3.format("~s");
 
         // Set up left axis
@@ -53,7 +53,7 @@ async function init() { // Allow for loading
         d3.select("svg")
             .append("g")
             .attr("transform", "translate("+margin+","+(height+margin)+")")
-            .call(d3.axisBottom(xscale));//.tickFormat(tick_format));
+            .call(d3.axisBottom(xscale));
 
         // Set up tool tip.
         var tooltip = d3.select('body')
@@ -68,7 +68,7 @@ async function init() { // Allow for loading
             .selectAll("rect")
             .data(data)
             .enter().append("rect")
-            .style("fill", function(d, i) { return colors(i); })
+            .style("fill", function(d, i) { return colors(d.Year); })
             .attr("width", xscale.bandwidth)
             .attr("x", function(d) { return margin + xscale(d.Year); })
             .attr("y", height + margin);
