@@ -12,94 +12,36 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
         <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="overview.js"></script>
         <style> .chart rect { fill: steelblue } </style>
     </head>
 
-    <body  onload='init()'>
-        <header class="container">
+    <body onload='init()'>
+        <div class="container">
             <h1 class="col"> <em>CS-498 Data Visualization - Narrative Visualization</em></h1>
             <h2 class="col">Distribution of Transportation Fatalities by Mode</h2>
             <h3 class="col">By: Adam Reid</h3>
-        </header>
+        </div>
+
         <hr/>
 
         <div class="container">
-            <p>
-                <nav align="center" class="navbar navbar-dark bg-dark" style="color: white">
-                    <a href="/html/" style="color: white">Overview</a> |
-                    <a href="/css/" style="color: whitesmoke">Highest</a> |
-                    <a href="/js/" style="color: whitesmoke">Lowest</a>
-                </nav>
-            </p>
 
-            <section class="row">
-                <section class="col">
-                    <span id="info"></span>
-                </section>
+            <nav align="center" class="navbar navbar-dark bg-dark" style="color: white">
+                <a href="/html/" style="color: rgb(136, 221, 247)">Overview</a> |
+                <a href="/css/" style="color: rgb(136, 221, 247)">Highest</a> |
+                <a href="/js/" style="color: rgb(136, 221, 247)">Lowest</a>
+            </nav>
 
-                <section class="col">
-                    <svg class="chart" width=500 height=500></svg>
-                </section>
-            </section>
+            <div class="row">
+                <div class="col">
+                    <p><div id="info"></div></p>
+                </div>
+
+                <div class="col">
+                    <svg class="chart" width=600 height=500></svg>
+                </div>
+            </div>
         </div>
-
-        <script>
-            var height = 400;
-            var width = 400;
-            var margin = 50;
-
-            var svg = d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + margin + ")");
-            var tick_format = d3.format("~s");
-
-            async function init() { // Allow for loading
-                //var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/data.csv", function(d) {
-                var data = await d3.csv("table_02_04q418.csv", function(d) {
-                    console.log(d)
-                    return {
-                         "x": +d.Year
-                     }
-                }).then(function(data) {
-                    var xdomain = [0, 1, 2, 3, 4, 5]
-                    var ydomain = [0, d3.max([1,2,42])]
-
-                    var xrange = [0, width];
-                    var yrange = [height, 0];
-
-                    console.log("Keys: " + Object.keys(data));
-                    console.log("Values: " + Object.values(data));
-
-                    var xscale = d3.scaleBand().domain(xdomain).range(xrange);
-                    var yscale = d3.scaleLinear().domain(ydomain).range(yrange);
-
-                    d3.select("svg")
-                        .append("g")
-                        .attr("transform", "translate("+margin+","+margin+")")
-                        .call(d3.axisLeft(yscale).tickFormat(tick_format));
-
-                    d3.select("svg")
-                        .append("g")
-                        .attr("transform", "translate("+margin+","+(height+margin)+")")
-                        .call(d3.axisBottom(xscale).tickFormat(tick_format));
-
-                    d3.select(".chart")
-                        .selectAll("rect")
-                        .data(data)
-                        .enter().append("rect")
-                        .attr("width", xscale.bandwidth)
-                        .attr("x", function(d, i) { return margin + xscale(i); })
-                        .attr("y", height + margin)
-                        .transition().duration(3000).delay(1000)
-                        .attr("height", function(d, i) {return height - yscale(d.y); })
-                        .attr("y", function(d) { return margin + yscale(d.y); });
-                }).catch(function(error, rows) {
-                    console.log("An error occurred.");
-                });
-
-                document.getElementById("info").innerHTML = "From 1999 to 2017, transportation in the United States " +
-                    "has seen a decrease in transportation fatalities. While not linear, there are myriad reasons as " +
-                    "to why the decrease has occurred -- some of these being improvements in automation, safety, " +
-                    "training, or decreased usage of the recorded mode of transportation.";
-            }
-        </script>
     </body>
 </html>
