@@ -100,7 +100,7 @@ function process(data, cols) {
         .append("g")
         .attr("transform", "translate("+margin+","+margin+")")
         .call(d3.axisLeft(yscale).tickFormat(tick_format))
-        .transition().duration(1000).attr("font-size", "16")
+        .transition().duration(1000).delay(1250).attr("font-size", "16")
         .transition().duration(1000).attr("font-size", "10");
 
     // Set up bottom axis.
