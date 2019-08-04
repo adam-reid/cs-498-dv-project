@@ -2,6 +2,8 @@ var height = 450;
 var width = 720;
 var margin = 40;
 
+var initialLoad = true;
+
 var overviewData;
 var largeData;
 var smallData;
@@ -185,6 +187,49 @@ function process(data, cols) {
         .attr("height", d => { return yscale(d[0]) - yscale(d[1]); })
         .attr("y", d => { return margin + yscale(d[1]); });
 
+    // Demonstrate that the chart moves
+    if (initialLoad) {
+        initialLoad = false;
+
+        legend
+            .attr("font-weight", "normal")
+            .style("fill", "black")
+            .attr("font-size", "10")
+            .transition().delay(2500).duration(1000)
+            .attr("font-weight", function(d, i) { return (i == 0) ? "bold" : "normal";})
+            .style("fill", function(d, i) { return (i == 0) ? cscale[0] : "black";})
+            .attr("font-size", function(d, i) { return (i == 0) ? "20" : "10";})
+            .transition().delay(1500).duration(1000)
+            .attr("font-weight", "normal")
+            .style("fill", "black")
+            .attr("font-size", "10");
+
+        chart.transition()
+            .duration(1000)
+            .delay(3000)
+            .attr("height", d => { return (d[0] == 0) ? yscale(d[0]) - yscale(d[1]) : 0; })
+            .attr("y", d => { return (d[0] == 0) ? margin + yscale(d[1]) : height + margin; });
+
+        bardata.selectAll("text")
+            .data(stack[0].map(d => { return {"Year": d.data.Year, "value": d[1]}; } ))
+            .enter()
+            .append("text")
+            .attr("class","label")
+            .attr("x", d => { return margin + xscale.bandwidth()/2 + xscale(d.Year); })
+            .attr("y", d => { return margin + yscale(d.value) - 10; })
+            .style("fill", cscale[0])
+            .transition().delay(3000).duration(1000)
+            .text(d => { return d.value; })
+            .transition().delay(500)
+            .remove();
+
+        chart
+            .transition()
+            .duration(1000)
+            .delay(5000)
+            .attr("height", d => { return yscale(d[0]) - yscale(d[1]); })
+            .attr("y", d => { return margin + yscale(d[1]); });
+    }
     // Set up Mouse events
     var inspect = 0;
 
