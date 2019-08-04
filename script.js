@@ -1,6 +1,6 @@
 var height = 450;
-var width = 740;
-var margin = 35;
+var width = 720;
+var margin = 40;
 
 var overviewData;
 var largeData;
@@ -25,7 +25,8 @@ function overview() {
     document.getElementById("info").innerHTML = "From 1999 to 2017, transportation in the United States " +
     "has seen a decrease in transportation fatalities. While not linear, there are myriad reasons as " +
     "to why the decrease has occurred -- some of these being improvements in automation, safety, " +
-    "training, or decreased usage of the recorded mode of transportation.";
+    "training, or decreased usage of the mode of transportation. This is an overview of all " +
+    "of the data provided by the Bureau of Traffic Statistics.";
 
     document.getElementById("overview").disabled = true;
     document.getElementById("large").disabled = false;
@@ -38,8 +39,8 @@ function large() {
     removeAll();
     document.getElementById("info").innerHTML = "Among the categories in the data set, four of them " +
     "regularly have counts that exceed 1000 per year - Passenger Car Occupants, Truck Occupants, " +
-    "pedestrians, and Motorcyclists. These four categories alone comprise <em>85%</em> of annual " +
-    "transportation fatalities.";
+    "Pedestrians, and Motorcyclists. These four categories alone comprise <em><u>85%</u></em> of annual " +
+    "transportation fatalities, while only comprising approximately 11% of the categories available.";
 
     document.getElementById("overview").disabled = false;
     document.getElementById("large").disabled = true;
@@ -52,8 +53,8 @@ function small() {
     removeAll();
     document.getElementById("info").innerHTML = "The remaining categories comprise approximately 15% " +
     "of annual transportation fatalities. There are 31 categories that have fewer than 1000 fatalities " +
-    "annually. This means that ~88% of the modes of transportation categorized here make up ~15% of the " +
-    "annual transportation fatalities, while <em>the remaining 12% make up for 85%</em> of the annual " +
+    "annually. This means that the ~89% of transportation modes categorized here make up only ~15% of the " +
+    "annual transportation fatalities, and <em>the 11% of categories not here account for 85%</em> of the annual " +
     "transportation fatalities.";
 
     document.getElementById("overview").disabled = false;
@@ -99,7 +100,9 @@ function process(data, cols) {
         .append("g")
         .attr("transform", "translate("+margin+","+margin+")")
         .transition().duration(1000).delay(250).ease(d3.easePolyOut)
-        .call(d3.axisLeft(yscale).tickFormat(tick_format));
+        .call(d3.axisLeft(yscale).tickFormat(tick_format))
+        .transition().duration(1000).attr("font-size", "16")
+        .transition().duration(1000).attr("font-size", "10");
 
     // Set up bottom axis.
     d3.select("svg")
