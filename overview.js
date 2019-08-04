@@ -6,18 +6,36 @@ var svg = d3.select("svg")
     .append("g")
     .attr("transform", "translate(" + margin + "," + margin + ")");
 
+function overview() {
+    console.log("overview!");
+}
+
+function large() {
+    console.log("large!");
+}
+
+function small() {
+    console.log("small1")
+}
+
 async function init() { // Allow for loading
     var data = await d3.csv("https://adam-reid.github.io/cs-498-dv-project/table_02_04q418.csv", function(d, i, columns) {
         for(i = 0; i < columns.length; i++)
             d[columns[i]] = +d[columns[i]];
 
+        d.total = d["TOTAL fatalities"];
+        delete d["TOTAL fatalities"];
+
         return d;
     }).then(function(data) {
-        var keys = data.columns.slice(2); // skip year and totals.
+
+        var keys = data.columns.slice(1); // skip year and totals.
 
         // Prep the data
         var xarray = data.map(function(d) {return d.Year; });
-        var yarray = data.map(function(d) {return d["TOTAL fatalities"]; });
+        var yarray = data.map(function(d) {return d.total;});//["TOTAL fatalities"]; });
+
+        console.log(yarray);
 
         // Find y limit
         var ymax = d3.max(yarray)
@@ -154,7 +172,8 @@ async function init() { // Allow for loading
 
                 legend
                     .attr("font-weight", function(d, i) { return (i == j && inspect == 1) ? "bold" : "normal";})
-                    .style("fill", function(d, i) { return (i == j && inspect == 1) ? "red" : "black";})
+                    .style("fill", function(d, i) { return (i == j && inspect == 1) ? "dodgerblue" : "black";})
+                    .transition().duration(250)
                     .attr("font-size", function(d, i) { return (i == j && inspect == 1) ? "14" : "10";});
             });
 
@@ -165,7 +184,8 @@ async function init() { // Allow for loading
 
                 d3.select(this)
                     .attr("font-weight", "bold")
-                    .style("fill", "red")
+                    .style("fill", "dodgerblue")
+                    .transition().duration(250)
                     .attr("font-size", "14");
 
                 chart.style("opacity", function(c, ci) { return stack[i][ci] == c ? 0.5 : 1; });
@@ -175,6 +195,7 @@ async function init() { // Allow for loading
                     return; // do nothing.
 
                 d3.select(this)
+                        .transition().delay(250)
                         .attr("font-weight", "normal")
                         .style("fill", "black")
                         .attr("font-size", "10");
@@ -203,7 +224,8 @@ async function init() { // Allow for loading
 
                 legend
                     .attr("font-weight", function(d, i) { return (i == j && inspect == 1) ? "bold" : "normal";})
-                    .style("fill", function(d, i) { return (i == j && inspect == 1) ? "red" : "black";})
+                    .style("fill", function(d, i) { return (i == j && inspect == 1) ? "dodgerblue" : "black";})
+                    .transition().duration(250)
                     .attr("font-size", function(d, i) { return (i == j && inspect == 1) ? "14" : "10";});
             });
 
