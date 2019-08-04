@@ -99,12 +99,14 @@ function process(data, cols) {
     d3.select("svg")
         .append("g")
         .attr("transform", "translate("+margin+","+margin+")")
+        .transition().duration(1000).delay(250).ease(d3.easePolyOut)
         .call(d3.axisLeft(yscale).tickFormat(tick_format));
 
     // Set up bottom axis.
     d3.select("svg")
         .append("g")
         .attr("transform", "translate("+margin+","+(height+margin)+")")
+        .transition().duration(1000).delay(250).ease(d3.easePolyOut)
         .call(d3.axisBottom(xscale));
 
     // Set up tool tip.
@@ -131,13 +133,16 @@ function process(data, cols) {
         .attr("x", width + 350 - 19)
         .attr("width", 19)
         .attr("height", 19)
-        .style("fill", function(d, i) { return cscale[i%cscale.length]; })
+        .transition().duration(1000).delay(250).ease(d3.easeSin)
+        .style("fill", function(d, i) { return cscale[i%cscale.length]; });
 
     legend.append("text")
         .attr("x", width + 350 - 50)
         .attr("y", 9.5)
         .attr("dy", "0.32em")
+        .transition().duration(1000).delay(250).ease(d3.easeSin)
         .text(function(d) { return d; });
+
 
     // Set up the chart.
     var chart = d3.select("svg")
