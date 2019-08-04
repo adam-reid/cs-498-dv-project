@@ -1,6 +1,6 @@
 var height = 450;
-var width = 750;
-var margin = 25;
+var width = 740;
+var margin = 35;
 
 var overviewData;
 var largeData;
@@ -64,11 +64,11 @@ function small() {
 }
 
 function process(data, cols) {
-    var keys = cols.slice(1); // skip year and totals.
+    var keys = cols.slice(1); // skip year column
 
     // Prep the data
-    var xarray = data.map(function(d) {return d.Year; });
-    var yarray = data.map(function(d) {return d.total;});
+    var xarray = data.map(d => {return d.Year; });
+    var yarray = data.map(d => {return d.total;});
 
     // Find y limit
     var ymax = d3.max(yarray)
@@ -85,12 +85,11 @@ function process(data, cols) {
     // Create ranges
     var xrange = [0, width];
     var yrange = [height, 0];
-    var crange = ['#26BBD2', '#C61C6F'];
 
     // Create scales
     var xscale = d3.scaleBand().domain(xdomain).paddingInner(0.1).paddingOuter(0.1).range(xrange);
     var yscale = d3.scaleLinear().domain(ydomain).range(yrange);
-    var cscale = d3.schemePaired;
+    var cscale = d3.schemeCategory10;//.schemePaired;
 
     // X-Tick format
     var tick_format = d3.format("~s");
@@ -119,6 +118,13 @@ function process(data, cols) {
 
     var stack = d3.stack().keys(keys)(data);
 
+    var bardata = d3.select("svg").append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 12)
+        .attr("text-anchor", "middle")
+        .attr("font-weight", "bold")
+        .attr("dy", ".75em");
+
     // Set up legends
     var legend = d3.select("svg").append("g")
         .attr("font-family", "sans-serif")
@@ -141,7 +147,7 @@ function process(data, cols) {
         .attr("y", 9.5)
         .attr("dy", "0.32em")
         .transition().duration(1000).delay(250).ease(d3.easeSin)
-        .text(function(d) { return d; });
+        .text(d => { return d; });
 
 
     // Set up the chart.
@@ -153,15 +159,15 @@ function process(data, cols) {
         .enter().append("g")
         .style("fill", function(d, i) { return cscale[i%cscale.length]; })
         .selectAll("rect")
-        .data(function(d) { return d; })
+        .data(d => { return d; })
         .enter().append("rect")
         .attr("width", xscale.bandwidth)
-        .attr("x", function(d) { return margin + xscale(d.data.Year); })
+        .attr("x", d => { return margin + xscale(d.data.Year); })
         .style("fill", function(d, i) {
             var j = 0;
 
             for (j = 0; j < stack.length; j++) {
-                if (stack[j][i][0] == d[0] && stack[j][i][1] ==d[1]) {
+                if (stack[j][i][0] == d[0] && stack[j][i][1] == d[1]) {
                     break;
                 }
             }
@@ -175,8 +181,8 @@ function process(data, cols) {
         .duration(1000)
         .delay(250)
         .ease(d3.easeBackOut)
-        .attr("height", function(d) { return yscale(d[0]) - yscale(d[1]); })
-        .attr("y", function(d) { return margin + yscale(d[1]); });
+        .attr("height", d => { return yscale(d[0]) - yscale(d[1]); })
+        .attr("y", d => { return margin + yscale(d[1]); });
 
     // Set up Mouse events
     var inspect = 0;
@@ -221,9 +227,28 @@ function process(data, cols) {
                         return height + margin;
                 });
 
+            // Add labels
+            if (inspect == 1) {
+                var barinfo = stack[j].map(nd => { return {"Year": nd.data.Year, "value": nd[1] - nd[0]}; } );
+
+                bardata.selectAll("text")
+                    .data(barinfo)
+                    .enter()
+                    .append("text")
+                    .attr("class","label")
+                    .attr("x", nd => { return margin + xscale.bandwidth()/2 + xscale(nd.Year); })
+                    .attr("y", nd => { return margin + yscale(nd.value) - 10; })
+                    .style("fill", nd => { return cscale[j%cscale.length]; })
+                    .text(nd => { return nd.value; });
+            } else {
+                bardata.selectAll("text").transition().delay(1000).remove();
+            }
+
+
+            // Update Legend
             legend
                 .attr("font-weight", function(d, i) { return (i == j && inspect == 1) ? "bold" : "normal";})
-                .style("fill", function(d, i) { return (i == j && inspect == 1) ? "dodgerblue" : "black";})
+                .style("fill", function(d, i) { return (i == j && inspect == 1) ? cscale[j%cscale.length] : "black";})
                 .transition().duration(250)
                 .attr("font-size", function(d, i) { return (i == j && inspect == 1) ? "14" : "10";});
         });
@@ -235,7 +260,7 @@ function process(data, cols) {
 
             d3.select(this)
                 .attr("font-weight", "bold")
-                .style("fill", "dodgerblue")
+                .style("fill", cscale[i%cscale.length])
                 .transition().duration(250)
                 .attr("font-size", "14");
 
@@ -273,9 +298,27 @@ function process(data, cols) {
                         return height + margin;
                 });
 
+            // Add labels
+            if (inspect == 1) {
+                var barinfo = stack[j].map(nd => { return {"Year": nd.data.Year, "value": nd[1] - nd[0]}; } );
+                console.log(barinfo);
+
+                bardata.selectAll("text")
+                    .data(barinfo)
+                    .enter()
+                    .append("text")
+                    .attr("class","label")
+                    .attr("x", nd => { return margin + xscale.bandwidth()/2 + xscale(nd.Year); })
+                    .attr("y", nd => { return margin + yscale(nd.value) - 10; })
+                    .style("fill", nd => { return cscale[j%cscale.length]; })
+                    .text(nd => { return nd.value; });
+            } else {
+                bardata.selectAll("text").transition().delay(1000).remove();
+            }
+
             legend
                 .attr("font-weight", function(d, i) { return (i == j && inspect == 1) ? "bold" : "normal";})
-                .style("fill", function(d, i) { return (i == j && inspect == 1) ? "dodgerblue" : "black";})
+                .style("fill", function(d, i) { return (i == j && inspect == 1) ? cscale[j%cscale.length] : "black";})
                 .transition().duration(250)
                 .attr("font-size", function(d, i) { return (i == j && inspect == 1) ? "14" : "10";});
         });
@@ -315,17 +358,17 @@ async function init() { // Allow for loading
                   }, {});
             });
 
-        overviewData = overviewData.map(function(d) {
+        overviewData = overviewData.map(d => {
             d.total = Object.values(d).reduce((a,b) => a + b, 0) - d.Year;
             return d;
         })
 
-        smallData = smallData.map(function(d) {
+        smallData = smallData.map(d => {
             d.total = Object.values(d).reduce((a,b) => a + b, 0) - d.Year;
             return d;
         })
 
-        largeData = largeData.map(function(d) {
+        largeData = largeData.map(d => {
             d.total = Object.values(d).reduce((a,b) => a + b, 0) - d.Year;
             return d;
         })
