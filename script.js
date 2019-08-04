@@ -150,7 +150,7 @@ function process(data, cols) {
         .text(d => { return d; });
 
 
-    // Set up the chart.
+    // Set up the main chart.
     var chart = d3.select("svg")
         .attr("transform", "translate(" + margin + "," + margin + ")")
         .append("g")
@@ -193,11 +193,37 @@ function process(data, cols) {
             tooltip.html(d[1] - d[0])
                 .style('left', (d3.event.pageX - 35 + 'px'))
                 .style('top', (d3.event.pageY - 30 + 'px'));
+
             d3.select(this).style("opacity", .5);
+
+            var j = 0;
+
+            for (j = 0; j < stack.length; j++) {
+                if (stack[j][i][0] == d[0] && stack[j][i][1] ==d[1]) {
+                    break;
+                }
+            }
+
+            legend
+                .attr("font-weight", function(nd, ni) {
+                    return (j == ni) ? "bold" : "normal"; })
+                .style("fill", function(nd, ni) {
+                    return (j == ni) ? cscale[j%cscale.length] : "black"; })
+                .attr("font-size", function(nd, ni) {
+                    return (j == ni) ? 14 : 10; });
         })
         .on('mouseout', function(d) {
             tooltip.transition().duration(250).style('opacity', 0);
             d3.select(this).style("opacity", 1);
+
+            // only mouse out if not already in a selection
+            if (inspect == 0) {
+                legend
+                .attr("font-weight", "normal")
+                .style("fill", "black")
+                .attr("font-size", "10");
+            }
+
         })
         .on('click', function(d, i) {
             inspect = (inspect + 1) % 2;
@@ -210,6 +236,7 @@ function process(data, cols) {
                 }
             }
 
+            // Transition main chart
             chart.transition()
                 .duration(1500)
                 .attr("height", function(nd, ni) {
@@ -243,7 +270,6 @@ function process(data, cols) {
             } else {
                 bardata.selectAll("text").transition().delay(1000).remove();
             }
-
 
             // Update Legend
             legend
@@ -301,7 +327,6 @@ function process(data, cols) {
             // Add labels
             if (inspect == 1) {
                 var barinfo = stack[j].map(nd => { return {"Year": nd.data.Year, "value": nd[1] - nd[0]}; } );
-                console.log(barinfo);
 
                 bardata.selectAll("text")
                     .data(barinfo)
@@ -360,16 +385,20 @@ async function init() { // Allow for loading
 
         overviewData = overviewData.map(d => {
             d.total = Object.values(d).reduce((a,b) => a + b, 0) - d.Year;
+            d.average = d.total / (overviewColumns.length - 1);
+
             return d;
         })
 
         smallData = smallData.map(d => {
             d.total = Object.values(d).reduce((a,b) => a + b, 0) - d.Year;
+            d.average = d.total / (smallColumns.length - 1);
             return d;
         })
 
         largeData = largeData.map(d => {
             d.total = Object.values(d).reduce((a,b) => a + b, 0) - d.Year;
+            d.average = d.total / (largeColumns.length - 1);
             return d;
         })
 
