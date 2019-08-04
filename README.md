@@ -4,8 +4,8 @@
 
 ### Metadata
 
-* Source: [https://www.bts.dot.gov/content/distribution-transportation-fatalities-mode] (Bureau of Transportation Statistics)
-* File: [https://www.bts.dot.gov/sites/bts.dot.gov/files/table_02_04q418.xlsx](Table 2-4:  Distribution of Transportation Fatalities by Mode)
+* Source: [Bureau of Transportation Statistics](https://www.bts.dot.gov/content/distribution-transportation-fatalities-mode)
+* File: [table_02_04q18.xlsx](https://www.bts.dot.gov/sites/bts.dot.gov/files/table_02_04q418.xlsx)
 * Date Last Accessed: 2 August 2019
 * Key:
   * **N** = data do not exist
