@@ -35,8 +35,6 @@ async function init() { // Allow for loading
         var xarray = data.map(function(d) {return d.Year; });
         var yarray = data.map(function(d) {return d.total;});//["TOTAL fatalities"]; });
 
-        console.log(yarray);
-
         // Find y limit
         var ymax = d3.max(yarray)
         var yupper = Math.ceil(ymax/10000)*10000;
