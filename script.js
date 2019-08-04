@@ -22,16 +22,44 @@ function removeAll() {
 
 function overview() {
     removeAll();
+    document.getElementById("info").innerHTML = "From 1999 to 2017, transportation in the United States " +
+    "has seen a decrease in transportation fatalities. While not linear, there are myriad reasons as " +
+    "to why the decrease has occurred -- some of these being improvements in automation, safety, " +
+    "training, or decreased usage of the recorded mode of transportation.";
+
+    document.getElementById("overview").disabled = true;
+    document.getElementById("large").disabled = false;
+    document.getElementById("small").disabled = false;
+
     process(overviewData, overviewColumns);
 }
 
 function large() {
     removeAll();
+    document.getElementById("info").innerHTML = "Among the categories in the data set, four of them " +
+    "regularly have counts that exceed 1000 per year - Passenger Car Occupants, Truck Occupants, " +
+    "pedestrians, and Motorcyclists. These four categories alone comprise <em>85%</em> of annual " +
+    "transportation fatalities.";
+
+    document.getElementById("overview").disabled = false;
+    document.getElementById("large").disabled = true;
+    document.getElementById("small").disabled = false;
+
     process(largeData, largeColumns);
 }
 
 function small() {
     removeAll();
+    document.getElementById("info").innerHTML = "The remaining categories comprise approximately 15% " +
+    "of annual transportation fatalities. There are 31 categories that have fewer than 1000 fatalities " +
+    "annually. This means that ~88% of the modes of transportation categorized here make up ~15% of the " +
+    "annual transportation fatalities, while <em>the remaining 12% make up for 85%</em> of the annual " +
+    "transportation fatalities.";
+
+    document.getElementById("overview").disabled = false;
+    document.getElementById("large").disabled = false;
+    document.getElementById("small").disabled = true;
+
     process(smallData, smallColumns);
 }
 
@@ -100,13 +128,13 @@ function process(data, cols) {
         .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
     legend.append("rect")
-        .attr("x", width + 250 - 19)
+        .attr("x", width + 350 - 19)
         .attr("width", 19)
         .attr("height", 19)
         .style("fill", function(d, i) { return cscale[i%cscale.length]; })
 
     legend.append("text")
-        .attr("x", width + 250 - 50)
+        .attr("x", width + 350 - 50)
         .attr("y", 9.5)
         .attr("dy", "0.32em")
         .text(function(d) { return d; });
@@ -301,9 +329,4 @@ async function init() { // Allow for loading
     }).catch(function(error, rows) {
         console.log("An error occurred.");
     });
-
-    document.getElementById("info").innerHTML = "From 1999 to 2017, transportation in the United States " +
-        "has seen a decrease in transportation fatalities. While not linear, there are myriad reasons as " +
-        "to why the decrease has occurred -- some of these being improvements in automation, safety, " +
-        "training, or decreased usage of the recorded mode of transportation.";
 }
