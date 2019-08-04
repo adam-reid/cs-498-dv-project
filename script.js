@@ -99,7 +99,6 @@ function process(data, cols) {
     d3.select("svg")
         .append("g")
         .attr("transform", "translate("+margin+","+margin+")")
-        .transition().duration(1000).delay(250).ease(d3.easePolyOut)
         .call(d3.axisLeft(yscale).tickFormat(tick_format))
         .transition().duration(1000).attr("font-size", "16")
         .transition().duration(1000).attr("font-size", "10");
@@ -108,7 +107,6 @@ function process(data, cols) {
     d3.select("svg")
         .append("g")
         .attr("transform", "translate("+margin+","+(height+margin)+")")
-        .transition().duration(1000).delay(250).ease(d3.easePolyOut)
         .call(d3.axisBottom(xscale));
 
     // Set up tool tip.
